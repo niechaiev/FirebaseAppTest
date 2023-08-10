@@ -1,5 +1,27 @@
 {
   "dependencies": {
+    "com.google.external-dependency-manager": {
+      "version": "file:D:/Downloads/com.google.external-dependency-manager-1.2.176.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {}
+    },
+    "com.google.firebase.analytics": {
+      "version": "file:D:/Downloads/com.google.firebase.analytics-11.3.0.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.google.firebase.app": "11.3.0"
+      }
+    },
+    "com.google.firebase.app": {
+      "version": "file:D:/Downloads/com.google.firebase.app-11.3.0.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.google.external-dependency-manager": "1.2.176"
+      }
+    },
     "com.unity.collab-proxy": {
       "version": "2.0.5",
       "depth": 0,
