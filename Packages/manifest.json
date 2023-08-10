@@ -4,6 +4,7 @@
     "com.google.firebase.analytics": "file:D:/Downloads/com.google.firebase.analytics-11.3.0.tgz",
     "com.google.firebase.app": "file:D:/Downloads/com.google.firebase.app-11.3.0.tgz",
     "com.unity.collab-proxy": "2.0.5",
+    "com.unity.device-simulator.devices": "1.0.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.5",
