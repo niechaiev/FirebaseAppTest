@@ -23,11 +23,11 @@
       }
     },
     "com.google.firebase.auth": {
-      "version": "file:D:/Downloads/com.google.firebase.auth-11.2.0.tgz",
+      "version": "file:D:/Downloads/com.google.firebase.auth-11.3.0.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
-        "com.google.firebase.app": "11.2.0"
+        "com.google.firebase.app": "11.3.0"
       }
     },
     "com.google.firebase.database": {
