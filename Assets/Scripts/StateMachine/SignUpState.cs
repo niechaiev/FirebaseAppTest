@@ -14,8 +14,8 @@ namespace StateMachine
         public override void EnterState()
         {
             stateContext.SignCanvas.gameObject.SetActive(true);
-            stateContext.signButton.GetComponentInChildren<TMP_Text>().text = "Sign Up";
-            stateContext.signButton.onClick.AddListener(stateContext.SignUp);
+            stateContext.SignButton.GetComponentInChildren<TMP_Text>().text = "Sign Up";
+            stateContext.SignButton.onClick.AddListener(stateContext.SignUp);
         }
 
 
@@ -23,18 +23,22 @@ namespace StateMachine
         {
             var registerTask = stateContext.Auth
                 .CreateUserWithEmailAndPasswordAsync(
-                    stateContext.emailField.text,
-                    stateContext.passwordField.text);
+                    stateContext.EmailField.text,
+                    stateContext.PasswordField.text);
             
             yield return new WaitUntil(() => registerTask.IsCompleted);
-
-            Debug.Log(registerTask.Exception);
+            if (registerTask.Exception != null)
+            {
+                Debug.LogError(registerTask.Exception);
+                yield return null;
+            }
+            stateContext.SwitchState(stateContext.MainMenuState);
         }
 
         public override void LeaveState()
         {
             stateContext.SignCanvas.gameObject.SetActive(false);
-            stateContext.signButton.onClick.RemoveListener(stateContext.SignUp);
+            stateContext.SignButton.onClick.RemoveListener(stateContext.SignUp);
         }
     }
 }

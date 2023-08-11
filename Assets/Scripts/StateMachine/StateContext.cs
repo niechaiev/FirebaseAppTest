@@ -3,46 +3,67 @@ using Firebase;
 using Firebase.Analytics;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 using States;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Serialization;
 using Button = UnityEngine.UI.Button;
 
 namespace StateMachine
 {
     public class StateContext : MonoBehaviour
     {
-        public Canvas MainCanvas;
-        public Canvas PlayerDataCanvas;
-        public Canvas SignCanvas;
-        [SerializeField] public TMP_Text textField;
-        [SerializeField] public Button signInButton;
-        [SerializeField] public Button signOutButton;
-        [SerializeField] public Button signUpButton;
-        [SerializeField] public Button changeButton;
-        [SerializeField] public Button loadButton;
-        [SerializeField] public Button saveButton;
-        [SerializeField] public TMP_InputField inputField;
-        public Button goBackButton;
-        public Button signButton;
-        public TMP_InputField emailField;
-        public TMP_InputField passwordField;
+        [SerializeField] private Canvas mainCanvas;
+        [SerializeField] private Canvas playerDataCanvas;
+        [SerializeField] private Canvas signCanvas;
+        [SerializeField] private TMP_Text textField;
+        [SerializeField] private Button signInButton;
+        [SerializeField] private Button signOutButton;
+        [SerializeField] private Button signUpButton;
+        [SerializeField] private Button changeButton;
+        [SerializeField] private Button loadButton;
+        [SerializeField] private Button saveButton;
+        [SerializeField] private TMP_InputField inputField;
+        [SerializeField] private Button goBackButton;
+        [SerializeField] private Button signButton;
+        [SerializeField] private TMP_InputField emailField;
+        [SerializeField] private TMP_InputField passwordField;
+        public Canvas MainCanvas => mainCanvas;
+        public Canvas PlayerDataCanvas => playerDataCanvas;
+        public Canvas SignCanvas => signCanvas;
+        public TMP_Text TextField => textField;
+        public Button SignInButton => signInButton;
+        public Button SignOutButton => signOutButton;
+        public Button SignUpButton => signUpButton;
+        public Button ChangeButton => changeButton;
+        public Button LoadButton => loadButton;
+        public Button SaveButton => saveButton;
+        public TMP_InputField InputField => inputField;
+        public Button GoBackButton => goBackButton;
+        public Button SignButton => signButton;
+        public TMP_InputField EmailField => emailField;
+        public TMP_InputField PasswordField => passwordField;
+        public State CurrentState => currentState;
+        public FirebaseDatabase Database => database;
+        public DataSnapshot DataSnapshot => dataSnapshot;
+        public DatabaseReference Reference => reference;
 
         private State currentState;
-
         private MainMenuState mainMenuState;
         private ChangeDataState changeDataState;
         private SignUpState signUpState;
         private SignInState signInState;
+        public MainMenuState MainMenuState => mainMenuState;
+        public ChangeDataState ChangeDataState => changeDataState;
+        public SignUpState SignUpState => signUpState;
+        public SignInState SignInState => signInState;
 
         private const string PlayerKey = "PLAYER_KEY";
 
-        // Start is called before the first frame update
         private FirebaseDatabase database;
         private DataSnapshot dataSnapshot;
         private DatabaseReference reference;
-        
         private FirebaseAuth auth;
         public FirebaseAuth Auth => auth;
 
@@ -62,38 +83,39 @@ namespace StateMachine
             currentState = newGameState;
             currentState.EnterState();
         }
-        
+
         public void SignUp()
         {
             StartCoroutine(signUpState.SignUpAsync());
         }
+        
+        public void SignIn()
+        {
+            StartCoroutine(signInState.SignInAsync());
+        }
 
         void Start()
         {
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(_ =>
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(_ =>
             {
                 FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-
-                FirebaseAnalytics.LogEvent("custom2", "custom", 1);
+                
                 if (_.Exception != null)
                     Debug.LogError(_.Exception);
-
-                Debug.Log("im debugging");
-                database = FirebaseDatabase.DefaultInstance;
-                auth = FirebaseAuth.DefaultInstance;
-                reference = database.GetReference(PlayerKey);
-                reference.ValueChanged += ValueChangedHandler;
-
-                if (auth.CurrentUser.IsValid())
-                {
-                    textField.text = $"Welcome, {auth.CurrentUser.Email}";
-                }
+                
+                CacheFirebaseInstances();
+                AddListeners();
+                SwitchState(mainMenuState);
             });
-
-            AddListeners();
-            SwitchState(mainMenuState);
         }
 
+        private void CacheFirebaseInstances()
+        {
+            database = FirebaseDatabase.DefaultInstance;
+            auth = FirebaseAuth.DefaultInstance;
+            reference = database.GetReference(PlayerKey);
+            reference.ValueChanged += ValueChangedHandler;
+        }
 
         private void AddListeners()
         {
@@ -108,7 +130,8 @@ namespace StateMachine
 
         private void SignOut()
         {
-            Auth.SignOut();
+            auth.SignOut();
+            mainMenuState.UpdateWelcomeMessage();
         }
 
 
@@ -128,8 +151,7 @@ namespace StateMachine
         {
             LoadPlayer();
         }
-
-
+        
         public void SavePlayer(PlayerData player)
         {
             database.GetReference(PlayerKey).SetRawJsonValueAsync(JsonUtility.ToJson(player));
@@ -148,5 +170,7 @@ namespace StateMachine
             dataSnapshot = await database.GetReference(PlayerKey).GetValueAsync();
             return dataSnapshot.Exists;
         }
+
+ 
     }
 }
