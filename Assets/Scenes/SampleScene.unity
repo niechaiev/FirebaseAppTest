@@ -1562,7 +1562,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &705507994
 Light:
   m_ObjectHideFlags: 0
@@ -4662,7 +4662,7 @@ GameObject:
   - component: {fileID: 1832719293}
   - component: {fileID: 1832719294}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Context
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4708,6 +4708,8 @@ MonoBehaviour:
   inputField: {fileID: 585002754}
   goBackButton: {fileID: 1191452885}
   signButton: {fileID: 1003758805}
+  emailField: {fileID: 1081817990}
+  passwordField: {fileID: 1387485830}
 --- !u!1 &1921861692
 GameObject:
   m_ObjectHideFlags: 0

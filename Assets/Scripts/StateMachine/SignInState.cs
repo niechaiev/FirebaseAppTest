@@ -13,6 +13,7 @@ namespace StateMachine
         {
             stateContext.SignCanvas.gameObject.SetActive(true);
             stateContext.signButton.GetComponentInChildren<TMP_Text>().text = "Sign In";
+            
         }
 
         public override void LeaveState()

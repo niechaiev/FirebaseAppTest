@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Firebase;
 using Firebase.Analytics;
+using Firebase.Auth;
 using Firebase.Database;
 using States;
 using TMPro;
@@ -25,6 +26,8 @@ namespace StateMachine
         [SerializeField] public TMP_InputField inputField;
         public Button goBackButton;
         public Button signButton;
+        public TMP_InputField emailField;
+        public TMP_InputField passwordField;
 
         private State currentState;
 
@@ -39,7 +42,9 @@ namespace StateMachine
         private FirebaseDatabase database;
         private DataSnapshot dataSnapshot;
         private DatabaseReference reference;
-
+        
+        private FirebaseAuth auth;
+        public FirebaseAuth Auth => auth;
 
 
         private void Awake()
@@ -57,6 +62,11 @@ namespace StateMachine
             currentState = newGameState;
             currentState.EnterState();
         }
+        
+        public void SignUp()
+        {
+            StartCoroutine(signUpState.SignUpAsync());
+        }
 
         void Start()
         {
@@ -70,8 +80,14 @@ namespace StateMachine
 
                 Debug.Log("im debugging");
                 database = FirebaseDatabase.DefaultInstance;
+                auth = FirebaseAuth.DefaultInstance;
                 reference = database.GetReference(PlayerKey);
                 reference.ValueChanged += ValueChangedHandler;
+
+                if (auth.CurrentUser.IsValid())
+                {
+                    textField.text = $"Welcome, {auth.CurrentUser.Email}";
+                }
             });
 
             AddListeners();
@@ -87,9 +103,13 @@ namespace StateMachine
             goBackButton.onClick.AddListener(() => SwitchState(mainMenuState));
             signUpButton.onClick.AddListener(() => SwitchState(signUpState));
             signInButton.onClick.AddListener(() => SwitchState(signInState));
-            
+            signOutButton.onClick.AddListener(SignOut);
         }
 
+        private void SignOut()
+        {
+            Auth.SignOut();
+        }
 
 
         private void ValueChangedHandler(object sender, ValueChangedEventArgs e)
