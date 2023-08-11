@@ -4695,9 +4695,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e29509c842b4493895b3a5c6b8f76f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainCanvas: {fileID: 1015529643}
-  PlayerDataCanvas: {fileID: 339855208}
-  SignCanvas: {fileID: 2073560662}
+  mainCanvas: {fileID: 1015529643}
+  playerDataCanvas: {fileID: 339855208}
+  signCanvas: {fileID: 2073560662}
   textField: {fileID: 204846171}
   signInButton: {fileID: 1175464219}
   signOutButton: {fileID: 647756610}

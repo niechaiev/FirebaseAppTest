@@ -7,6 +7,7 @@ namespace States
     {
         private const string WelcomeMessage = "Welcome, ";
         private const string GuestUser = "Guest";
+
         public MainMenuState(StateContext stateContext) : base(stateContext)
         {
         }
@@ -19,13 +20,13 @@ namespace States
 
         public void UpdateWelcomeMessage()
         {
-            if (stateContext.Auth.CurrentUser != null)
-            {
-                stateContext.TextField.text = $"{WelcomeMessage} {stateContext.Auth.CurrentUser.Email}";
-                return;
-            }
+            var textField = stateContext.TextField;
+            textField.text = WelcomeMessage;
 
-            stateContext.TextField.text = $"{WelcomeMessage} {GuestUser}";
+            if (stateContext.Auth.CurrentUser.IsAnonymous)
+                textField.text += GuestUser;
+            else
+                textField.text += stateContext.Auth.CurrentUser.Email;
         }
 
         public override void LeaveState()

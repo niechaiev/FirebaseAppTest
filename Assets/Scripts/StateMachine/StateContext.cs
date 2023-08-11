@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Threading.Tasks;
 using Firebase;
 using Firebase.Analytics;
@@ -88,7 +89,7 @@ namespace StateMachine
         {
             StartCoroutine(signUpState.SignUpAsync());
         }
-        
+
         public void SignIn()
         {
             StartCoroutine(signInState.SignInAsync());
@@ -96,19 +97,46 @@ namespace StateMachine
 
         void Start()
         {
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(_ =>
-            {
-                FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-                
-                if (_.Exception != null)
-                    Debug.LogError(_.Exception);
-                
-                CacheFirebaseInstances();
-                AddListeners();
-                SwitchState(mainMenuState);
-            });
+            StartCoroutine(InitializeFirebase());
         }
 
+        IEnumerator InitializeFirebase()
+        {
+            var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
+            yield return new WaitUntil(() => dependencyTask.IsCompleted);
+            
+            FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
+
+            if (dependencyTask.Exception != null)
+                Debug.LogError(dependencyTask.Exception);
+
+            CacheFirebaseInstances();
+
+            yield return SignInAnonymously();
+     
+            AddListeners();
+            SwitchState(mainMenuState);
+        }
+
+        private IEnumerator SignInAnonymously()
+        {
+            if (auth.CurrentUser == null)
+            {
+                var authTask = auth.SignInAnonymouslyAsync();
+                yield return new WaitUntil(() => authTask.IsCompleted);
+
+                if (authTask.IsCanceled)
+                {
+                    Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                }
+
+                if (authTask.IsFaulted)
+                {
+                    Debug.LogError("SignInAnonymouslyAsync encountered an error: " + authTask.Exception);
+                }
+            }
+            mainMenuState.UpdateWelcomeMessage();
+        }
         private void CacheFirebaseInstances()
         {
             database = FirebaseDatabase.DefaultInstance;
@@ -131,7 +159,9 @@ namespace StateMachine
         private void SignOut()
         {
             auth.SignOut();
-            mainMenuState.UpdateWelcomeMessage();
+            StartCoroutine(SignInAnonymously());
+
+
         }
 
 
@@ -151,7 +181,7 @@ namespace StateMachine
         {
             LoadPlayer();
         }
-        
+
         public void SavePlayer(PlayerData player)
         {
             database.GetReference(PlayerKey).SetRawJsonValueAsync(JsonUtility.ToJson(player));
@@ -170,7 +200,5 @@ namespace StateMachine
             dataSnapshot = await database.GetReference(PlayerKey).GetValueAsync();
             return dataSnapshot.Exists;
         }
-
- 
     }
 }
